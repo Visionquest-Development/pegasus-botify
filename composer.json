@@ -1,0 +1,25 @@
+{
+    "name": "visionquest/pegasus-botify",
+    "description": "AI-powered chat widget for Pegasus WordPress sites.",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Jim O'Brien",
+            "homepage": "https://visionquestdevelopment.com/"
+        }
+    ],
+    "require": {
+        "php": ">=7.4"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5"
+    },
+    "scripts": {
+        "test": "phpunit"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    }
+}

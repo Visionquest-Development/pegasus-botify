@@ -1,0 +1,25 @@
+{
+  "name": "pegasus-botify-widget",
+  "version": "0.5.0",
+  "private": true,
+  "type": "module",
+  "description": "Front-end widget for the Pegasus Botify WordPress plugin (launcher + lazy chat chunk).",
+  "license": "GPL-2.0-or-later",
+  "scripts": {
+    "build": "vite build",
+    "watch": "vite build --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-chatbotify": "^2.5.0",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
+  }
+}

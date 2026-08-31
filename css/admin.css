@@ -1,0 +1,36 @@
+/**
+ * pegasus-botify — admin styles.
+ *
+ * Minimal at Milestone 1. CMB2 supplies the settings-page styling; this file exists to
+ * match the suite's css/ convention and to hold future admin tweaks.
+ */
+
+.cmb2-options-page.pegasus_botify_options h2 {
+	margin-bottom: 0.5em;
+}
+
+/* Collapsible section headers (see js/admin-options.js). */
+.cmb-row.cmb-type-title.pegasus-section-header {
+	cursor: pointer;
+	user-select: none;
+	border-top: 1px solid #dcdcde;
+	padding-top: 0.75em;
+}
+
+/* Caret before the section title text. */
+.cmb-row.cmb-type-title.pegasus-section-header .cmb2-metabox-title::before {
+	content: '\25BE'; /* ▾ expanded */
+	display: inline-block;
+	margin-right: 8px;
+	font-size: 12px;
+	color: #646970;
+	transition: transform 0.12s ease;
+}
+
+.cmb-row.cmb-type-title.pegasus-section-header.pegasus-collapsed .cmb2-metabox-title::before {
+	transform: rotate(-90deg); /* ▸ collapsed */
+}
+
+.cmb-row.cmb-type-title.pegasus-section-header:hover .cmb2-metabox-title {
+	color: #2271b1;
+}
