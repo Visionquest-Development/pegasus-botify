@@ -8,8 +8,23 @@
 (function () {
   'use strict';
 
+  // Show a live "N px" readout next to each range slider.
+  function initRangeReadouts(wrap) {
+    wrap.querySelectorAll('input.pegasus-botify-range').forEach(function (input) {
+      var out = document.createElement('span');
+      out.className = 'pegasus-range-value';
+      var update = function () {
+        out.textContent = ' ' + input.value + ' px';
+      };
+      update();
+      input.insertAdjacentElement('afterend', out);
+      input.addEventListener('input', update);
+    });
+  }
+
   function init() {
     var wrap = document.querySelector('.cmb2-options-page') || document;
+    initRangeReadouts(wrap);
     var titles = wrap.querySelectorAll('.cmb-row.cmb-type-title');
     if (!titles.length) {
       return;

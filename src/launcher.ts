@@ -10,9 +10,36 @@
  * the click handler — so Rollup keeps the widget (and React) in a separate lazy chunk.
  */
 
-import type { BootstrapConfig, BubblePosition } from './config';
+import type { BootstrapConfig } from './config';
 
 const CONFIG_TAG_ID = 'pegasus-botify-config';
+
+// These small helpers are duplicated (not imported from config) so the launcher stays a
+// single self-contained chunk — importing shared *stateful* code from config would make
+// Rollup emit a cross-chunk import between the entry and the lazy widget chunk.
+
+function faClassName(raw: string | null | undefined): string {
+  const v = (raw || 'fa-comment').trim();
+  return /(^|\s)fa(\s|$)/.test(v) ? v : `fa ${v}`;
+}
+
+const CHAT_ICON_SVG =
+  '<svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true">' +
+  '<path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/></svg>';
+
+function isFontAwesomeAvailable(): boolean {
+  try {
+    const probe = document.createElement('i');
+    probe.className = 'fa';
+    probe.style.cssText = 'position:absolute;left:-9999px;visibility:hidden;';
+    document.body.appendChild(probe);
+    const family = getComputedStyle(probe).fontFamily || '';
+    probe.remove();
+    return /font\s*awesome/i.test(family);
+  } catch {
+    return false;
+  }
+}
 
 function readConfig(): BootstrapConfig {
   const el = document.getElementById(CONFIG_TAG_ID);
@@ -21,6 +48,11 @@ function readConfig(): BootstrapConfig {
     position: 'bottom-right',
     bubbleColor: null,
     greeting: 'Hi! How can I help?',
+    offsetBottom: 20,
+    offsetRight: 20,
+    windowOffsetBottom: 20,
+    windowOffsetRight: 20,
+    bubbleIcon: 'fa-comment',
   };
   if (!el || !el.textContent) {
     return fallback;
@@ -32,9 +64,11 @@ function readConfig(): BootstrapConfig {
   }
 }
 
-function positionStyles(position: BubblePosition): Partial<CSSStyleDeclaration> {
-  const base: Partial<CSSStyleDeclaration> = { position: 'fixed', bottom: '20px', zIndex: '2147483000' };
-  return position === 'bottom-left' ? { ...base, left: '20px' } : { ...base, right: '20px' };
+function positionStyles(config: BootstrapConfig): Partial<CSSStyleDeclaration> {
+  const bottom = `${config.offsetBottom}px`;
+  const side = `${config.offsetRight}px`;
+  const base: Partial<CSSStyleDeclaration> = { position: 'fixed', bottom, zIndex: '2147483000' };
+  return config.position === 'bottom-left' ? { ...base, left: side } : { ...base, right: side };
 }
 
 function createBubble(config: BootstrapConfig): HTMLButtonElement {
@@ -42,8 +76,16 @@ function createBubble(config: BootstrapConfig): HTMLButtonElement {
   btn.type = 'button';
   btn.setAttribute('aria-label', 'Open chat');
   btn.className = 'pegasus-botify-bubble';
-  btn.textContent = '💬';
-  Object.assign(btn.style, positionStyles(config.position), {
+  // Font Awesome 4 icon (the theme ships FA4), with a plain SVG fallback when FA is absent.
+  if (isFontAwesomeAvailable()) {
+    const icon = document.createElement('i');
+    icon.className = faClassName(config.bubbleIcon);
+    icon.setAttribute('aria-hidden', 'true');
+    btn.appendChild(icon);
+  } else {
+    btn.innerHTML = CHAT_ICON_SVG;
+  }
+  Object.assign(btn.style, positionStyles(config), {
     width: '60px',
     height: '60px',
     borderRadius: '50%',

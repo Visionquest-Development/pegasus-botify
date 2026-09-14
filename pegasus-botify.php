@@ -109,6 +109,40 @@ function pegasus_botify_ai_enabled() {
  *
  * @return Pegasus_Botify_Hours
  */
+/**
+ * Normalize a time value to 24-hour "HH:MM".
+ *
+ * CMB2's time field stores times in the site's format, which is usually 12-hour ("9:00 AM").
+ * The Hours module requires zero-padded 24-hour "HH:MM", so normalize whatever was saved
+ * (12-hour or 24-hour) here. Parsed by components to avoid timezone/timestamp pitfalls.
+ *
+ * @param mixed $raw
+ * @return string "HH:MM" or '' if unparseable.
+ */
+function pegasus_botify_normalize_time( $raw ) {
+	$raw = trim( (string) $raw );
+	if ( '' === $raw ) {
+		return '';
+	}
+	if ( ! preg_match( '/^\s*(\d{1,2}):(\d{2})\s*([AaPp][Mm])?\s*$/', $raw, $m ) ) {
+		return '';
+	}
+	$hour   = (int) $m[1];
+	$minute = (int) $m[2];
+	if ( ! empty( $m[3] ) ) { // 12-hour with AM/PM.
+		$pm = 'PM' === strtoupper( $m[3] );
+		if ( 12 === $hour ) {
+			$hour = $pm ? 12 : 0;
+		} elseif ( $pm ) {
+			$hour += 12;
+		}
+	}
+	if ( $hour < 0 || $hour > 23 || $minute < 0 || $minute > 59 ) {
+		return '';
+	}
+	return sprintf( '%02d:%02d', $hour, $minute );
+}
+
 function pegasus_botify_get_hours() {
 	$get = function ( $key, $default = '' ) {
 		if ( function_exists( 'cmb2_get_option' ) ) {
@@ -128,10 +162,12 @@ function pegasus_botify_get_hours() {
 			if ( empty( $row['day'] ) || ! isset( $row['open'], $row['close'] ) ) {
 				continue;
 			}
-			if ( '' === $row['open'] || '' === $row['close'] ) {
+			$open  = pegasus_botify_normalize_time( $row['open'] );
+			$close = pegasus_botify_normalize_time( $row['close'] );
+			if ( '' === $open || '' === $close ) {
 				continue;
 			}
-			$regular[ $row['day'] ][] = array( $row['open'], $row['close'] );
+			$regular[ $row['day'] ][] = array( $open, $close );
 		}
 	}
 
@@ -154,8 +190,12 @@ function pegasus_botify_get_hours() {
 			}
 			if ( ! empty( $row['closed'] ) ) {
 				$exceptions_by_date[ $date ]['closed'] = true;
-			} elseif ( ! empty( $row['open'] ) && ! empty( $row['close'] ) ) {
-				$exceptions_by_date[ $date ]['hours'][] = array( $row['open'], $row['close'] );
+			} else {
+				$open  = pegasus_botify_normalize_time( isset( $row['open'] ) ? $row['open'] : '' );
+				$close = pegasus_botify_normalize_time( isset( $row['close'] ) ? $row['close'] : '' );
+				if ( '' !== $open && '' !== $close ) {
+					$exceptions_by_date[ $date ]['hours'][] = array( $open, $close );
+				}
 			}
 			if ( empty( $exceptions_by_date[ $date ]['label'] ) && ! empty( $row['label'] ) ) {
 				$exceptions_by_date[ $date ]['label'] = $row['label'];

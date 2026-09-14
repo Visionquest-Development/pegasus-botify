@@ -490,6 +490,73 @@ class Pegasus_Botify_Options {
 			),
 		) );
 		$cmb->add_field( array(
+			'name'            => __( 'Bubble — distance from bottom (px)', 'pegasus-botify' ),
+			'desc'            => __( 'Nudge the chat bubble (and its tooltip) up to clear reCAPTCHA badges, cookie bars, or other floating widgets in the corner.', 'pegasus-botify' ),
+			'id'              => 'offset_bottom',
+			'type'            => 'text',
+			'default'         => '20',
+			'sanitization_cb' => 'absint',
+			'attributes'      => array(
+				'type'  => 'range',
+				'min'   => '0',
+				'max'   => '300',
+				'step'  => '2',
+				'class' => 'pegasus-botify-range',
+			),
+		) );
+		$cmb->add_field( array(
+			'name'            => __( 'Bubble — distance from side (px)', 'pegasus-botify' ),
+			'desc'            => __( 'Horizontal gap from the edge (right edge for bottom-right, left edge for bottom-left).', 'pegasus-botify' ),
+			'id'              => 'offset_side',
+			'type'            => 'text',
+			'default'         => '20',
+			'sanitization_cb' => 'absint',
+			'attributes'      => array(
+				'type'  => 'range',
+				'min'   => '0',
+				'max'   => '300',
+				'step'  => '2',
+				'class' => 'pegasus-botify-range',
+			),
+		) );
+		$cmb->add_field( array(
+			'name'            => __( 'Chat window — distance from bottom (px)', 'pegasus-botify' ),
+			'desc'            => __( 'Where the open chat window sits, independent of the bubble.', 'pegasus-botify' ),
+			'id'              => 'window_offset_bottom',
+			'type'            => 'text',
+			'default'         => '20',
+			'sanitization_cb' => 'absint',
+			'attributes'      => array(
+				'type'  => 'range',
+				'min'   => '0',
+				'max'   => '300',
+				'step'  => '2',
+				'class' => 'pegasus-botify-range',
+			),
+		) );
+		$cmb->add_field( array(
+			'name'            => __( 'Chat window — distance from side (px)', 'pegasus-botify' ),
+			'desc'            => __( 'Horizontal gap for the open chat window.', 'pegasus-botify' ),
+			'id'              => 'window_offset_side',
+			'type'            => 'text',
+			'default'         => '20',
+			'sanitization_cb' => 'absint',
+			'attributes'      => array(
+				'type'  => 'range',
+				'min'   => '0',
+				'max'   => '300',
+				'step'  => '2',
+				'class' => 'pegasus-botify-range',
+			),
+		) );
+		$cmb->add_field( array(
+			'name'    => __( 'Chat button icon (Font Awesome 4)', 'pegasus-botify' ),
+			'desc'    => __( 'Font Awesome 4 icon class for the chat bubble, e.g. <code>fa-comment</code>, <code>fa-comments</code>, <code>fa-question</code>, or a brand like <code>fa-facebook</code>. The <code>fa</code> prefix is added automatically. Requires Font Awesome 4 (included with the Pegasus theme).', 'pegasus-botify' ),
+			'id'      => 'bubble_icon',
+			'type'    => 'text',
+			'default' => 'fa-comment',
+		) );
+		$cmb->add_field( array(
 			'name'       => __( 'Avatar image', 'pegasus-botify' ),
 			'id'         => 'avatar',
 			'type'       => 'file',

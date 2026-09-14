@@ -105,10 +105,15 @@ class Pegasus_Botify_Enqueue {
 		$bubble = trim( (string) $get( 'bubble_color', '' ) );
 
 		return array(
-			'restUrl'     => esc_url_raw( rest_url( Pegasus_Botify_REST::REST_NAMESPACE . '/config' ) ),
-			'position'    => (string) $get( 'position', 'bottom-right' ),
-			'bubbleColor' => '' !== $bubble ? $bubble : null,
-			'greeting'    => (string) $get( 'greeting', 'Hi! How can I help?' ),
+			'restUrl'      => esc_url_raw( rest_url( Pegasus_Botify_REST::REST_NAMESPACE . '/config' ) ),
+			'position'     => (string) $get( 'position', 'bottom-right' ),
+			'bubbleColor'  => '' !== $bubble ? $bubble : null,
+			'greeting'     => (string) $get( 'greeting', 'Hi! How can I help?' ),
+			'offsetBottom'       => (int) $get( 'offset_bottom', 20 ),
+			'offsetRight'        => (int) $get( 'offset_side', 20 ),
+			'windowOffsetBottom' => (int) $get( 'window_offset_bottom', 20 ),
+			'windowOffsetRight'  => (int) $get( 'window_offset_side', 20 ),
+			'bubbleIcon'         => (string) $get( 'bubble_icon', 'fa-comment' ),
 		);
 	}
 

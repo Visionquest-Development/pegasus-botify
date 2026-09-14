@@ -7,10 +7,16 @@
  * the LLM fallback arrive in later milestones (§6.1, M6–M7).
  */
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type FC, type SVGProps } from 'react';
 import { createRoot } from 'react-dom/client';
 import ChatBot, { type Flow, type Settings, type Styles, type Params } from 'react-chatbotify';
-import type { BootstrapConfig, RenderConfig } from './config';
+import {
+  faClassName,
+  isFontAwesomeAvailable,
+  CHAT_ICON_SVG,
+  type BootstrapConfig,
+  type RenderConfig,
+} from './config';
 import {
   optionLabels,
   callAI,
@@ -32,6 +38,11 @@ function fallbackConfig(bootstrap: BootstrapConfig): RenderConfig {
     position: bootstrap.position,
     bubbleColor: bootstrap.bubbleColor,
     greeting: bootstrap.greeting,
+    offsetBottom: bootstrap.offsetBottom,
+    offsetRight: bootstrap.offsetRight,
+    windowOffsetBottom: bootstrap.windowOffsetBottom,
+    windowOffsetRight: bootstrap.windowOffsetRight,
+    bubbleIcon: bootstrap.bubbleIcon,
     quickReplies: [],
     appearance: {
       inheritTheme: true,
@@ -95,6 +106,24 @@ function contactLine(cfg: RenderConfig): string {
   return cfg.business.phone ? `Please call ${cfg.business.phone}.` : 'Please use our contact page.';
 }
 
+// The chat button icon: a Font Awesome 4 <i> when FA is present (the Pegasus theme ships it),
+// otherwise a plain inline SVG so the button is never blank. RCB renders a component icon
+// inside its toggle button.
+function makeBubbleIcon(faClass: string): FC<SVGProps<SVGSVGElement>> {
+  const useFa = isFontAwesomeAvailable();
+  const Icon = () =>
+    useFa ? (
+      <i className={faClass} aria-hidden="true" style={{ fontSize: 26, lineHeight: 1, color: '#fff', display: 'inline-flex' }} />
+    ) : (
+      <span
+        aria-hidden="true"
+        style={{ color: '#fff', display: 'inline-flex' }}
+        dangerouslySetInnerHTML={{ __html: CHAT_ICON_SVG }}
+      />
+    );
+  return Icon as unknown as FC<SVGProps<SVGSVGElement>>;
+}
+
 function buildSettings(cfg: RenderConfig): Settings {
   const colors = resolveBrandColors(cfg);
   const avatar = cfg.appearance.avatar || undefined;
@@ -107,6 +136,7 @@ function buildSettings(cfg: RenderConfig): Settings {
       showFooter: true,
     },
     chatWindow: { defaultOpen: true, showTypingIndicator: true },
+    chatButton: { icon: makeBubbleIcon(faClassName(cfg.bubbleIcon)) },
     header: {
       title: cfg.business.name || 'Chat',
       showAvatar: !!avatar,
@@ -124,14 +154,38 @@ function buildSettings(cfg: RenderConfig): Settings {
 }
 
 function buildStyles(cfg: RenderConfig): Styles {
-  if (cfg.position === 'bottom-left') {
+  // position may live top-level (bootstrap) or under appearance (REST config).
+  const position = cfg.appearance?.position ?? cfg.position ?? 'bottom-right';
+
+  // Bubble/button offset (also drives the tooltip).
+  const offB = cfg.offsetBottom ?? 20;
+  const offS = cfg.offsetRight ?? 20;
+  const bBottom = `${offB}px`;
+  const bSide = `${offS}px`;
+
+  // Open chat window offset (independent from the bubble).
+  const wBottom = `${cfg.windowOffsetBottom ?? 20}px`;
+  const wSide = `${cfg.windowOffsetRight ?? 20}px`;
+
+  // The "Need help?" tooltip is positioned independently by RCB, so it must be offset too or
+  // it detaches from the button and drops toward the corner (into other floating widgets).
+  // RCB's default places the tooltip ~95px further from the side and ~10px higher than the
+  // button; add those deltas so the tooltip keeps sitting beside the button at any offset.
+  const tipBottom = `${offB + 10}px`;
+  const tipSide = `${offS + 95}px`;
+
+  if (position === 'bottom-left') {
     return {
-      chatButtonStyle: { left: 20, right: 'auto' },
-      chatWindowStyle: { left: 20, right: 'auto' },
-      tooltipStyle: { left: 20, right: 'auto' },
+      chatButtonStyle: { bottom: bBottom, left: bSide, right: 'auto' },
+      chatWindowStyle: { bottom: wBottom, left: wSide, right: 'auto' },
+      tooltipStyle: { bottom: tipBottom, left: tipSide, right: 'auto' },
     };
   }
-  return {};
+  return {
+    chatButtonStyle: { bottom: bBottom, right: bSide },
+    chatWindowStyle: { bottom: wBottom, right: wSide },
+    tooltipStyle: { bottom: tipBottom, right: tipSide },
+  };
 }
 
 function Widget({ bootstrap, prefetched }: { bootstrap: BootstrapConfig; prefetched: RenderConfig | null }) {

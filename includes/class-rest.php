@@ -67,6 +67,11 @@ class Pegasus_Botify_REST {
 		$data = array(
 			'version'          => self::CONFIG_VERSION,
 			'greeting'         => (string) self::opt( 'greeting', 'Hi! How can I help?' ),
+			'offsetBottom'       => (int) self::opt( 'offset_bottom', 20 ),
+			'offsetRight'        => (int) self::opt( 'offset_side', 20 ),
+			'windowOffsetBottom' => (int) self::opt( 'window_offset_bottom', 20 ),
+			'windowOffsetRight'  => (int) self::opt( 'window_offset_side', 20 ),
+			'bubbleIcon'       => (string) self::opt( 'bubble_icon', 'fa-comment' ),
 			'quickReplies'     => self::quick_replies(),
 			'appearance'       => self::appearance(),
 			'afterHoursAction' => (string) self::opt( 'after_hours_action', 'capture_lead' ),

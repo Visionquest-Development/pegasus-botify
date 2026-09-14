@@ -9,6 +9,20 @@
 	margin-bottom: 0.5em;
 }
 
+/* Range sliders (bubble offsets). */
+input.pegasus-botify-range {
+	vertical-align: middle;
+	width: 240px;
+	max-width: 100%;
+}
+
+.pegasus-range-value {
+	display: inline-block;
+	min-width: 3.5em;
+	font-weight: 600;
+	color: #1d2327;
+}
+
 /* Collapsible section headers (see js/admin-options.js). */
 .cmb-row.cmb-type-title.pegasus-section-header {
 	cursor: pointer;
