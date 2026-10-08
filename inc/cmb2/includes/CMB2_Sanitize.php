@@ -97,10 +97,23 @@ class CMB2_Sanitize {
 				break;
 			case 'multicheck':
 			case 'multicheck_inline':
-			case 'file_list':
 			case 'group':
 				// no filtering
 				$sanitized_value = $this->value;
+				break;
+			case 'file_list':
+				$sanitized_value = array();
+				$protocols       = $this->field->args( 'protocols' );
+				foreach ( (array) $this->value as $attachment_id => $url ) {
+					if ( ! is_int( $attachment_id ) || $attachment_id < 1 || ! is_scalar( $url ) ) {
+						continue;
+					}
+
+					$url = self::sanitize_and_secure_url( $url, $protocols, '' );
+					if ( '' !== $url ) {
+						$sanitized_value[ $attachment_id ] = $url;
+					}
+				}
 				break;
 			default:
 				// Handle repeatable fields array
@@ -399,7 +412,7 @@ class CMB2_Sanitize {
 			} else {
 				$datetime->setTimezone( new DateTimeZone( $tzstring ) );
 				$utc_stamp   = date_timestamp_get( $datetime ) - $offset;
-				$this->value = serialize( $datetime );
+				$this->value = json_encode( $datetime );
 			}
 
 			if ( $this->field->group ) {
@@ -431,7 +444,7 @@ class CMB2_Sanitize {
 	 * @return string       Sanitized data
 	 */
 	public function textarea() {
-		return is_array( $this->value ) ? array_map( 'wp_kses_post', $this->value ) : wp_kses_post( $this->value );
+		return is_array( $this->value ) ? array_map( 'wp_kses_post', $this->value ) : ( $this->value !== null ? wp_kses_post( $this->value ) : '' );
 	}
 
 	/**
@@ -448,7 +461,11 @@ class CMB2_Sanitize {
 			return $repeat_value;
 		}
 
-		return htmlspecialchars_decode( stripslashes( $this->value ) );
+		if ( ! is_scalar( $this->value ) ) {
+			return '';
+		}
+
+		return htmlspecialchars_decode( stripslashes( (string) $this->value ), ENT_COMPAT );
 	}
 
 	/**
@@ -485,7 +502,7 @@ class CMB2_Sanitize {
 		$i       = $this->field->group->index;
 
 		// Check group $alldata data.
-		$id_val  = isset( $alldata[ $base_id ][ $i ][ $id_key ] )
+		$id_val = isset( $alldata[ $base_id ][ $i ][ $id_key ] )
 			? absint( $alldata[ $base_id ][ $i ][ $id_key ] )
 			: '';
 
@@ -521,7 +538,7 @@ class CMB2_Sanitize {
 		if ( $this->value && ! $id_val ) {
 			$id_val = CMB2_Utils::image_id_from_url( $this->value );
 
-		// If there is an ID but user emptied the input value, remove the ID.
+			// If there is an ID but user emptied the input value, remove the ID.
 		} elseif ( ! $this->value && $id_val ) {
 			$id_val = null;
 		}
@@ -573,7 +590,7 @@ class CMB2_Sanitize {
 		$values_array = $this->value;
 
 		$new_value = array();
-		foreach ( $values_array as $iterator => $this->value ) {
+		foreach ( $values_array as $this->value ) {
 			if ( $this->value ) {
 				$val = $this->$method( true );
 				if ( ! empty( $val ) ) {
