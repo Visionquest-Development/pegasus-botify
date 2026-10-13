@@ -66,7 +66,7 @@ moment a client adds their Anthropic key.
   hooks, `pegasus_botify_is_pegasus_active()` theme detection, i18n loading, `[pegasus_botify]`
   shortcode (renders the widget mount point only — widget not built yet).
 - `includes/class-options.php` — CMB2 settings page (single menu item), all spec §5.2 fields.
-- `inc/cmb2/` — bundled CMB2 v2.10.1 (copied from the parent Pegasus theme).
+- `inc/cmb2/` — bundled CMB2 v2.13.3 (originally copied from the parent Pegasus theme, now updated independently).
 
 **M2 — Hours module:**
 - `includes/class-hours.php` — **WordPress-independent** `Pegasus_Botify_Hours`: normalize/
